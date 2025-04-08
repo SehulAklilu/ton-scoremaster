@@ -47,12 +47,14 @@ function Home() {
       }).toString();
 
       const response = await axios.get(`/api/rooms?${queryParams}`);
-      setRooms(response.data.rooms);
-      setPagination(response.data.pagination);
+      setRooms(response.data?.rooms || []);
+      setPagination(response.data?.pagination || { total: 0, totalPages: 0 });
       setError(null);
       setLoading(false);
     } catch (err) {
       setError('Failed to fetch rooms. Please try again later.');
+      setRooms([]);
+      setPagination({ total: 0, totalPages: 0 });
       setLoading(false);
     }
   };
@@ -78,7 +80,7 @@ function Home() {
   };
 
   const renderContent = () => {
-    if (loading && rooms.length === 0) {
+    if (loading) {
       return (
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
           <CircularProgress />
@@ -111,7 +113,7 @@ function Home() {
       );
     }
 
-    if (rooms.length === 0) {
+    if (!rooms || rooms.length === 0) {
       return (
         <Box 
           display="flex" 
